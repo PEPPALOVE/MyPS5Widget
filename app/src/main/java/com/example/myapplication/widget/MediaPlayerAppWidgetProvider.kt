@@ -62,37 +62,26 @@ class MediaPlayerAppWidgetProvider : AppWidgetProvider() {
         views.setTextViewText(R.id.title, title)
         views.setTextViewText(R.id.subtext, subtitle)
 
-        // Load and set cover image
+        // Load and set cover image using Glide
         val relativePictureUrl = state?.attributes?.entityPictureLocal ?: state?.attributes?.entityPicture
         if (!relativePictureUrl.isNullOrBlank()) {
-            try {
-                // Combine with base URL if it's a relative path
-                val fullUrl = if (relativePictureUrl.startsWith("http")) {
-                    relativePictureUrl
-                } else {
-                    HomeAssistantClient.BASE_URL.removeSuffix("/") + relativePictureUrl
-                }
-
-                val client = OkHttpClient()
-                val request = Request.Builder()
-                    .url(fullUrl)
-                    .addHeader("Authorization", HomeAssistantClient.TOKEN)
-                    .build()
-                
-                val response = client.newCall(request).execute()
-                if (response.isSuccessful) {
-                    response.body?.byteStream()?.use { input ->
-                        val options = BitmapFactory.Options()
-                        options.inSampleSize = 2 // Downsample to avoid exceeding memory limits
-                        val bmp = BitmapFactory.decodeStream(input, null, options)
-                        if (bmp != null) {
-                            views.setImageViewBitmap(R.id.cover, bmp)
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
+            val fullUrl = if (relativePictureUrl.startsWith("http")) {
+                relativePictureUrl
+            } else {
+                HomeAssistantClient.BASE_URL.removeSuffix("/") + relativePictureUrl
             }
+
+            val appWidgetTarget = com.bumptech.glide.request.target.AppWidgetTarget(
+                context.applicationContext,
+                R.id.cover,
+                views,
+                appWidgetId
+            )
+
+            com.bumptech.glide.Glide.with(context.applicationContext)
+                .asBitmap()
+                .load(fullUrl)
+                .into(appWidgetTarget)
         }
 
         // Update the widget
