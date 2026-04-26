@@ -15,5 +15,6 @@ data class MediaAttributes(
     @SerialName("media_title") val mediaTitle: String? = null,
     @SerialName("media_artist") val mediaArtist: String? = null,
     @SerialName("entity_picture") val entityPicture: String? = null,
+    @SerialName("entity_picture_local") val entityPictureLocal: String? = null,
     @SerialName("friendly_name") val friendlyName: String? = null
 )
