@@ -10,7 +10,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,34 +39,71 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     var state by remember { mutableStateOf<EntityState?>(null) }
                     var error by remember { mutableStateOf<String?>(null) }
+                    var isLoading by remember { mutableStateOf(false) }
+                    val scope = rememberCoroutineScope()
 
-                    LaunchedEffect(Unit) {
-                        try {
-                            state = HomeAssistantClient.service.getEntityState(
-                                HomeAssistantClient.TOKEN,
-                                HomeAssistantClient.ENTITY_ID
-                            )
-                        } catch (e: Exception) {
-                            error = e.message
+                    fun loadData() {
+                        scope.launch {
+                            isLoading = true
+                            error = null
+                            try {
+                                state = HomeAssistantClient.service.getEntityState(
+                                    HomeAssistantClient.TOKEN,
+                                    HomeAssistantClient.ENTITY_ID
+                                )
+                            } catch (e: Exception) {
+                                error = e.toString()
+                                e.printStackTrace()
+                            } finally {
+                                isLoading = false
+                            }
                         }
                     }
 
-                    Column(modifier = Modifier.padding(innerPadding).padding(16.dp)) {
-                        Text(text = "Home Assistant Media Player", style = MaterialTheme.typography.headlineMedium)
+                    LaunchedEffect(Unit) {
+                        loadData()
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .padding(16.dp)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        Text(text = "Диагностика PS5", style = MaterialTheme.typography.headlineMedium)
                         
+                        if (isLoading) {
+                            CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                        }
+
                         if (error != null) {
-                            Text(text = "Error: $error", color = MaterialTheme.colorScheme.error)
-                        } else if (state == null) {
-                            Text(text = "Loading...")
-                        } else {
+                            Text(
+                                text = "ОШИБКА:\n$error",
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                            Text(
+                                text = "\n1. Проверьте, что телефон в Wi-Fi 10.0.0.x\n2. Проверьте адрес http://10.0.0.44:8123 в браузере телефона.",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        } else if (state != null) {
+                            Text(text = "Связь установлена!", color = MaterialTheme.colorScheme.primary)
                             Greeting(name = state?.attributes?.friendlyName ?: "Player")
-                            Text(text = "Status: ${state?.state}")
-                            Text(text = "Now Playing: ${state?.attributes?.mediaTitle ?: "Nothing"}")
+                            Text(text = "Статус: ${state?.state}")
+                            Text(text = "Медиа: ${state?.attributes?.mediaTitle ?: "Ничего не играет"}")
+                        }
+
+                        Button(
+                            onClick = { loadData() },
+                            modifier = Modifier.padding(top = 16.dp),
+                            enabled = !isLoading
+                        ) {
+                            Text("Проверить соединение")
                         }
                         
                         Text(
-                            text = "\nДобавьте виджет на главный экран, чтобы управлять плеером.",
-                            style = MaterialTheme.typography.bodySmall
+                            text = "\nIP: 10.0.0.44\nID: media_player.playstation_5",
+                            style = MaterialTheme.typography.labelSmall
                         )
                     }
                 }

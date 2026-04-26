@@ -10,7 +10,12 @@ import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.layout.Alignment
+import androidx.glance.layout.Box
 import androidx.glance.layout.Column
+import androidx.glance.Image
+import androidx.glance.ImageProvider
+import androidx.glance.layout.Box
+import com.example.myapplication.R
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.padding
 import androidx.glance.text.Text
@@ -43,32 +48,41 @@ class MediaPlayerWidget : GlanceAppWidget() {
 
     @Composable
     private fun WidgetContent(state: EntityState?) {
-        Column(
+        val isInactive = state == null || state.state == "off" || state.state == "unavailable" || state.state == "idle"
+
+        Box(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .background(Color.DarkGray)
+                .background(Color.Black)
                 .padding(8.dp),
-            horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
-            verticalAlignment = Alignment.Vertical.CenterVertically
+            contentAlignment = Alignment.Center
         ) {
-            if (state == null) {
-                Text(
-                    text = "Error loading data",
-                    style = TextStyle(color = ColorProvider(Color.White))
+            if (isInactive) {
+                // Заглушка с логотипом PlayStation
+                Image(
+                    provider = ImageProvider(R.drawable.ic_playstation),
+                    contentDescription = "PS5 Logo",
+                    modifier = GlanceModifier.fillMaxSize().padding(16.dp)
                 )
             } else {
-                Text(
-                    text = state.attributes.mediaTitle ?: "No Title",
-                    style = TextStyle(color = ColorProvider(Color.White))
-                )
-                Text(
-                    text = state.attributes.mediaArtist ?: "Unknown Artist",
-                    style = TextStyle(color = ColorProvider(Color.LightGray))
-                )
-                Text(
-                    text = "Status: ${state.state}",
-                    style = TextStyle(color = ColorProvider(Color.Cyan))
-                )
+                // Информация о воспроизведении
+                Column(
+                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+                    verticalAlignment = Alignment.Vertical.CenterVertically
+                ) {
+                    Text(
+                        text = state?.attributes?.mediaTitle ?: "No Title",
+                        style = TextStyle(color = ColorProvider(Color.White))
+                    )
+                    Text(
+                        text = state?.attributes?.mediaArtist ?: "PS5",
+                        style = TextStyle(color = ColorProvider(Color.LightGray))
+                    )
+                    Text(
+                        text = "• ${state?.state} •",
+                        style = TextStyle(color = ColorProvider(Color.Cyan))
+                    )
+                }
             }
         }
     }
