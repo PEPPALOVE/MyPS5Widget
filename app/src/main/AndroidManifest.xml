@@ -27,7 +27,7 @@
         </activity>
 
         <receiver
-            android:name=".widget.MediaPlayerWidgetReceiver"
+            android:name=".widget.MediaPlayerAppWidgetProvider"
             android:exported="true"
             android:label="HA Media Player">
             <intent-filter>

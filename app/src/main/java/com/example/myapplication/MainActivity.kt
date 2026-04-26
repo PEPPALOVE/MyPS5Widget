@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.ha.EntityState
 import com.example.myapplication.ha.HomeAssistantClient
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.myapplication.ui.theme.MyApplicationTheme
@@ -87,6 +88,7 @@ class MainActivity : ComponentActivity() {
                             )
                         } else if (state != null) {
                             Text(text = "Связь установлена!", color = MaterialTheme.colorScheme.primary)
+                            Text(text = "DEBUG STATE: '${state?.state}'", style = MaterialTheme.typography.labelLarge, color = Color.Yellow)
                             Greeting(name = state?.attributes?.friendlyName ?: "Player")
                             Text(text = "Статус: ${state?.state}")
                             Text(text = "Медиа: ${state?.attributes?.mediaTitle ?: "Ничего не играет"}")
