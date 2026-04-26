@@ -63,20 +63,33 @@ class MediaPlayerAppWidgetProvider : AppWidgetProvider() {
         views.setTextViewText(R.id.subtext, subtitle)
 
         // Load and set cover image
-        val pictureUrl = state?.attributes?.entityPicture
-        if (!pictureUrl.isNullOrBlank()) {
+        val relativePictureUrl = state?.attributes?.entityPicture
+        if (!relativePictureUrl.isNullOrBlank()) {
             try {
+                // Combine with base URL if it's a relative path
+                val fullUrl = if (relativePictureUrl.startsWith("http")) {
+                    relativePictureUrl
+                } else {
+                    HomeAssistantClient.BASE_URL.removeSuffix("/") + relativePictureUrl
+                }
+
                 val client = OkHttpClient()
-                val request = Request.Builder().url(pictureUrl).build()
+                val request = Request.Builder()
+                    .url(fullUrl)
+                    .addHeader("Authorization", HomeAssistantClient.TOKEN)
+                    .build()
+                
                 val response = client.newCall(request).execute()
                 if (response.isSuccessful) {
                     response.body?.byteStream()?.use { input ->
                         val bmp = BitmapFactory.decodeStream(input)
-                        views.setImageViewBitmap(R.id.cover, bmp)
+                        if (bmp != null) {
+                            views.setImageViewBitmap(R.id.cover, bmp)
+                        }
                     }
                 }
-            } catch (_: Exception) {
-                // ignore, placeholder remains
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
 

@@ -18,7 +18,7 @@ interface HomeAssistantApi {
 }
 
 object HomeAssistantClient {
-    private const val BASE_URL = "http://10.0.0.44:8123/"
+    const val BASE_URL = "http://10.0.0.44:8123/"
     const val TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI0YzcxODgxZTEwMzE0ZDIyYjZkYTkwODc2NWE5NzE4NCIsImlhdCI6MTc3NzIyMjYwMiwiZXhwIjoyMDkyNTgyNjAyfQ.Bf1nHQOkxBRl4TedjBTynby5tktSxeykTAxoUR0uFqo"
     const val ENTITY_ID = "media_player.playstation_5"
 
