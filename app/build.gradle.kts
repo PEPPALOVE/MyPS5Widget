@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.okhttp.logging)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.glide)
+    implementation("com.github.bumptech.glide:okhttp3-integration:4.16.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
