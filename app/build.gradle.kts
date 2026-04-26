@@ -50,9 +50,6 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
-    // Glance
-    implementation(libs.androidx.glance)
-    implementation(libs.androidx.glance.appwidget)
 
     // Retrofit & Networking
     implementation(libs.retrofit)
