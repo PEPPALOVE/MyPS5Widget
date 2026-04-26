@@ -63,7 +63,7 @@ class MediaPlayerAppWidgetProvider : AppWidgetProvider() {
         views.setTextViewText(R.id.subtext, subtitle)
 
         // Load and set cover image
-        val relativePictureUrl = state?.attributes?.entityPicture
+        val relativePictureUrl = state?.attributes?.entityPictureLocal ?: state?.attributes?.entityPicture
         if (!relativePictureUrl.isNullOrBlank()) {
             try {
                 // Combine with base URL if it's a relative path
@@ -82,7 +82,9 @@ class MediaPlayerAppWidgetProvider : AppWidgetProvider() {
                 val response = client.newCall(request).execute()
                 if (response.isSuccessful) {
                     response.body?.byteStream()?.use { input ->
-                        val bmp = BitmapFactory.decodeStream(input)
+                        val options = BitmapFactory.Options()
+                        options.inSampleSize = 2 // Downsample to avoid exceeding memory limits
+                        val bmp = BitmapFactory.decodeStream(input, null, options)
                         if (bmp != null) {
                             views.setImageViewBitmap(R.id.cover, bmp)
                         }
